@@ -1,59 +1,48 @@
-"use client";
-import React, { useState } from "react";
+'use client';
+import React from 'react';
 
-type DataTableProps = {
-  columns: { key: string; label: string }[];
+export default function DataTable({
+  data,
+  columns,
+}: {
   data: any[];
-};
-
-export default function DataTable({ columns, data }: DataTableProps) {
-  const [page, setPage] = useState(1);
-  const pageSize = 10;
-  const totalPages = Math.ceil(data.length / pageSize);
-  const paginated = data.slice((page - 1) * pageSize, page * pageSize);
-
+  columns: { key: string; label: string }[];
+}) {
   return (
-    <div className="table-responsive bg-light p-3 rounded shadow-sm">
-      <table className="table table-bordered table-hover mb-0">
-        <thead className="table-dark">
+    <div className="overflow-x-auto mt-6 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md">
+      <table className="min-w-full text-sm text-left border-collapse">
+        <thead className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
           <tr>
             {columns.map((col) => (
-              <th key={col.key} scope="col">
+              <th
+                key={col.key}
+                className="px-4 py-3 font-semibold tracking-wide text-sm border-b dark:border-gray-600"
+              >
                 {col.label}
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {paginated.map((row, idx) => (
-            <tr key={idx}>
+          {data.map((row, rowIndex) => (
+            <tr
+              key={rowIndex}
+              className={`border-b dark:border-gray-700 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700 ${
+                rowIndex % 2 === 1 ? 'bg-gray-50 dark:bg-gray-900' : ''
+              }`}
+            >
               {columns.map((col) => (
-                <td key={col.key}>{row[col.key]}</td>
+                <td
+                  key={col.key}
+                  className="px-4 py-3 text-gray-800 dark:text-gray-100"
+                >
+                  {row[col.key]}
+                </td>
               ))}
             </tr>
           ))}
         </tbody>
       </table>
-
-      <div className="d-flex justify-between justify-content-between align-items-center mt-3 px-2">
-        <button
-          className="btn btn-secondary btn-sm"
-          onClick={() => setPage((p) => Math.max(1, p - 1))}
-          disabled={page === 1}
-        >
-          Prev
-        </button>
-        <span className="fw-semibold">
-          Page {page} of {totalPages}
-        </span>
-        <button
-          className="btn btn-secondary btn-sm"
-          onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-          disabled={page === totalPages}
-        >
-          Next
-        </button>
-      </div>
     </div>
   );
 }

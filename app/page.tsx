@@ -1,14 +1,10 @@
-"use client"; // Enables client-side hooks used by Dashboard or children
+'use client';
+import Dashboard from '../src/components/Dashboard';
 
-import React from 'react';
-import Dashboard from '../src/components/Dashboard'; // ✅ Adjust path if needed
-
-const HomePage = () => {
+export default function HomePage() {
   return (
-    <main>
+    <main className="max-w-7xl mx-auto px-4 md:px-8 py-8 space-y-8 text-white">
       <Dashboard />
     </main>
   );
-};
-
-export default HomePage; // ✅ Required default export for Next.js
+}

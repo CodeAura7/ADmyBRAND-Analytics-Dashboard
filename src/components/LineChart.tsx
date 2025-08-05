@@ -1,21 +1,27 @@
-"use client";
+'use client';
 import React from 'react';
+import { useTheme } from 'next-themes';
 import {
   ResponsiveContainer,
-  LineChart as RechartsLineChart,
+  LineChart,
   Line,
   CartesianGrid,
   XAxis,
   YAxis,
   Tooltip,
   Legend,
-} from "recharts";
-import { useTheme } from "next-themes";
+} from 'recharts';
 
-export type LineChartProps = {
-  data: Array<Record<string, any>>;
+type LineProps = {
+  dataKey: string;
+  name: string;
+  color?: string;
+};
+
+type CustomLineChartProps = {
+  data: any[];
   xKey: string;
-  lines: { dataKey: string; color?: string; name?: string }[];
+  lines: LineProps[];
   height?: number;
   className?: string;
 };
@@ -25,45 +31,72 @@ export default function CustomLineChart({
   xKey,
   lines,
   height = 300,
-  className = "",
-}: LineChartProps) {
+  className = '',
+}: CustomLineChartProps) {
   const { theme } = useTheme();
-  
-  // Use fixed dark text color for axis ticks regardless of theme
-  const axisColor = '#1f2937';
+  const isDark = theme === 'dark';
+
+  const axisColor = isDark ? '#e5e5e5' : '#1f2937';
+  const gridColor = isDark ? '#444' : '#ccc';
+  const tooltipBg = isDark ? '#1f2937' : '#ffffff';
+  const tooltipText = isDark ? '#ffffff' : '#1f2937';
 
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg p-4 shadow-md ${className}`}>
+    <div
+      className={`bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md transition-transform duration-200 hover:scale-[1.01] ${className}`}
+    >
+      <h2 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">
+        Performance Trends
+      </h2>
+
       <ResponsiveContainer width="100%" height={height}>
-        <RechartsLineChart data={data}>
-          <CartesianGrid
-            strokeDasharray="3 3"
-            stroke={theme === 'dark' ? '#374151' : '#e5e7eb'}
+        <LineChart data={data}>
+          <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+          <XAxis
+            dataKey={xKey}
+            stroke={axisColor}
+            tick={{ fontSize: 12, fill: axisColor }}
+            axisLine={{ stroke: axisColor }}
+            tickLine={{ stroke: axisColor }}
           />
-          <XAxis dataKey={xKey} stroke={axisColor} tick={{ fill: axisColor }} />
-          <YAxis stroke={axisColor} tick={{ fill: axisColor }} />
+          <YAxis
+            stroke={axisColor}
+            tick={{ fontSize: 12, fill: axisColor }}
+            axisLine={{ stroke: axisColor }}
+            tickLine={{ stroke: axisColor }}
+          />
           <Tooltip
             contentStyle={{
-              backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
-              borderColor: theme === 'dark' ? '#4b5563' : '#e5e7eb',
-              borderRadius: '0.5rem',
+              backgroundColor: tooltipBg,
+              borderRadius: '8px',
+              border: 'none',
+              color: tooltipText,
+              boxShadow: '0 4px 14px rgba(0, 0, 0, 0.1)',
             }}
-            itemStyle={{ color: theme === 'dark' ? '#f9fafb' : '#111827' }}
-            labelStyle={{ color: theme === 'dark' ? '#d1d5db' : '#374151' }}
+            labelStyle={{ color: tooltipText }}
+            itemStyle={{ color: tooltipText }}
           />
-          <Legend wrapperStyle={{ color: axisColor }} />
+          <Legend
+            wrapperStyle={{
+              color: axisColor,
+              fontSize: 12,
+              paddingTop: 8,
+            }}
+          />
           {lines.map((line) => (
             <Line
               key={line.dataKey}
               type="monotone"
               dataKey={line.dataKey}
-              stroke={line.color || "#6366f1"}
+              stroke={line.color || '#3b82f6'}
               name={line.name}
               strokeWidth={2}
-              dot={false}
+              dot={{ r: 3 }}
+              activeDot={{ r: 6 }}
+              isAnimationActive
             />
           ))}
-        </RechartsLineChart>
+        </LineChart>
       </ResponsiveContainer>
     </div>
   );

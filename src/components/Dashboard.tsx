@@ -1,146 +1,209 @@
 'use client';
+import React, { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
+import CustomLineChart from '@/components/LineChart';
+import CustomBarChart from '@/components/BarChart';
+import DonutChart from '@/components/DonutChart';
+import DataTable from '@/components/DataTable';
+import ThemeToggle from '@/components/ThemeToggle';
+import Filter from '@/components/Filter';
 
-import React, { useState, useEffect } from 'react';
-import { Metric, ChartData, FilterOptions } from '../types';
-import CustomLineChart from './LineChart';
-import CustomBarChart from './BarChart';
-import DonutChart from './DonutChart';
-import DataTable from './DataTable';
-import Filter from './Filter';
-import ThemeToggle from './ThemeToggle';
+const CSVLink = dynamic(() => import('react-csv').then(mod => mod.CSVLink), { ssr: false });
 
-const dummyChartData: ChartData[] = [
-  { date: '2024-01-01', users: 120, revenue: 1000, conversions: 30, growth: 5 },
-  { date: '2024-01-02', users: 150, revenue: 1200, conversions: 40, growth: 6 },
-  { date: '2024-01-03', users: 170, revenue: 1400, conversions: 50, growth: 7 },
-  { date: '2024-01-04', users: 160, revenue: 1350, conversions: 45, growth: 6.5 },
-  { date: '2024-01-05', users: 180, revenue: 1500, conversions: 55, growth: 7.2 },
-  { date: '2024-01-06', users: 200, revenue: 1650, conversions: 60, growth: 8 },
-  { date: '2024-01-07', users: 220, revenue: 1800, conversions: 65, growth: 8.5 },
+const dummyChartData = [
+  { date: '2025-07-02', users: 200, revenue: 6000, conversions: 45, growth: 8, source: 'Google Ads' },
+  { date: '2025-07-03', users: 180, revenue: 5500, conversions: 40, growth: 7, source: 'Facebook' },
+  { date: '2025-07-05', users: 190, revenue: 6500, conversions: 35, growth: 6, source: 'Google Ads' },
+  { date: '2025-07-06', users: 160, revenue: 5000, conversions: 27, growth: 3, source: 'Facebook' },
+  { date: '2025-07-07', users: 220, revenue: 7500, conversions: 48, growth: 9, source: 'Instagram' },
+  { date: '2025-07-08', users: 205, revenue: 6700, conversions: 42, growth: 6, source: 'Google Ads' },
+  { date: '2025-07-10', users: 215, revenue: 7100, conversions: 46, growth: 7, source: 'Instagram' },
+  { date: '2025-07-11', users: 185, revenue: 5900, conversions: 34, growth: 4, source: 'Facebook' },
+  { date: '2025-07-13', users: 210, revenue: 7200, conversions: 47, growth: 8, source: 'Instagram' },
+  { date: '2025-07-15', users: 230, revenue: 7700, conversions: 55, growth: 9, source: 'Google Ads' },
+  { date: '2025-07-17', users: 150, revenue: 4700, conversions: 22, growth: 1, source: 'Facebook' }
 ];
 
-const dummyMetrics: Metric[] = [
-  { id: 'total-users', title: 'Total Users', value: 12500 },
-  { id: 'total-revenue', title: 'Total Revenue', value: 75000 },
-  { id: 'conversion-rate', title: 'Conversion Rate', value: 3.5 },
-  { id: 'avg-cpc', title: 'Avg. CPC', value: 1.25 },
+const dummyMetrics = [
+  { id: 'revenue', title: 'Revenue', value: 12500, diff: 10 },
+  { id: 'users', title: 'Users', value: 3200, diff: 5 },
+  { id: 'conversions', title: 'Conversions', value: 450, diff: 8 },
+  { id: 'growth', title: 'Growth Percentage', value: 15, diff: 2 }
 ];
 
-const Dashboard: React.FC = () => {
-  const [metrics, setMetrics] = useState<Metric[]>(dummyMetrics);
-  const [chartData, setChartData] = useState<ChartData[]>(dummyChartData);
-  const [filterOptions, setFilterOptions] = useState<FilterOptions>({
-    dateRange: {
-      startDate: new Date('2024-01-01'),
-      endDate: new Date('2024-01-07'),
-    },
-    campaignType: '',
-  });
+type FiltersType = {
+  dateRange: { startDate: Date; endDate: Date };
+  campaignType: string;
+};
 
-  const handleExport = () => {
-    console.log("Exporting data with current filters:", filterOptions);
-    console.log("Data to export:", chartData);
-  };
+export default function Dashboard() {
+  const [metrics, setMetrics] = useState(dummyMetrics);
+  const [chartData, setChartData] = useState(dummyChartData);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 5;
+
+  const totalPages = Math.ceil(chartData.length / rowsPerPage);
+  const paginatedData = chartData.slice(
+    (currentPage - 1) * rowsPerPage,
+    currentPage * rowsPerPage
+  );
 
   useEffect(() => {
-    const filteredData = dummyChartData.filter((d) => {
-      const date = new Date(d.date);
-      const start = filterOptions.dateRange.startDate.toISOString().split('T')[0];
-      const end = filterOptions.dateRange.endDate.toISOString().split('T')[0];
-      const current = date.toISOString().split('T')[0];
-      return current >= start && current <= end;
-    });
-    setChartData(filteredData);
-  }, [filterOptions]);
+    const interval = setInterval(() => {
+      const updated = dummyMetrics.map((m) => ({
+        ...m,
+        value: Math.round(m.value * (1 + Math.random() * 0.05)),
+      }));
+      setMetrics(updated);
+      setLoading(false);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleFilter = (filters: FiltersType) => {
+    setLoading(true);
+    setTimeout(() => {
+      const filteredData = dummyChartData.filter(d => {
+        const date = new Date(d.date);
+        const startDate = new Date(filters.dateRange.startDate);
+        const endDate = new Date(filters.dateRange.endDate);
+        const typeMatch = !filters.campaignType || d.source === filters.campaignType;
+        return date >= startDate && date <= endDate && typeMatch;
+      });
+      setChartData(filteredData);
+      setCurrentPage(1);
+      setLoading(false);
+    }, 500);
+  };
+
+  const campaignTypes = ['Google Ads', 'Facebook', 'Instagram'];
 
   return (
-    <div className="container py-4">
-      <header className="d-flex flex-column flex-sm-row justify-content-between align-items-center mb-4">
-        <h1 className="text-center text-sm-start fw-bold mb-3 mb-sm-0">
-          ADmyBRAND Insights Dashboard
-        </h1>
-        <div className="d-flex gap-2">
-          <ThemeToggle />
-          <button
-            onClick={handleExport}
-            className="btn btn-primary"
-          >
-            Export Data
-          </button>
+    <section className="space-y-10">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-5xl font-bold text-gray-900 dark:text-white">Dashboard</h2>
+          <p className="text-base text-gray-500 dark:text-gray-400 mt-1">
+            Overview of your marketing performance
+          </p>
         </div>
-      </header>
-
-      <Filter
-        onFilter={(filters) => setFilterOptions(filters)}
-        campaignTypes={['Social', 'Email', 'Search Ads', 'Display']}
-      />
-
-      <div className="row g-3 mb-4">
-        {metrics.map((metric) => (
-          <div className="col-12 col-sm-6 col-lg-3" key={metric.id}>
-            <div className="card text-center h-100 shadow-sm">
-              <div className="card-body">
-                <h5 className="card-title text-muted">{metric.title}</h5>
-                <h2 className="text-primary fw-bold mt-2">
-                  {metric.title.includes('Rate') || metric.title.includes('Growth')
-                    ? `${metric.value}%`
-                    : metric.value.toLocaleString()}
-                </h2>
-              </div>
-            </div>
-          </div>
-        ))}
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
+          <CSVLink
+            data={chartData}
+            filename={'admybrand-insights.csv'}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
+              bg-blue-600 text-white shadow hover:shadow-md
+              hover:bg-blue-700 active:scale-95 transition"
+          >
+            📤 Export CSV
+          </CSVLink>
+        </div>
       </div>
 
-      <div className="row g-4 my-4">
-        <div className="col-12 col-lg-6">
+      {/* Filter */}
+      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-6 shadow-md hover:shadow-lg transition">
+        <Filter onFilter={handleFilter} campaignTypes={campaignTypes} />
+      </div>
+
+      {/* Metrics */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+        {metrics.map((metric) => {
+          const isCurrency = metric.id === 'revenue';
+          const isPercentage = metric.id === 'growth';
+          return (
+            <div
+              key={metric.id}
+              className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-5 shadow-md hover:shadow-lg transition"
+            >
+              <p className="text-sm text-gray-500 dark:text-gray-400">{metric.title}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+                {isCurrency
+                  ? `$${metric.value.toLocaleString()}`
+                  : isPercentage
+                  ? `${metric.value}%`
+                  : metric.value.toLocaleString()}
+              </p>
+              <p className="text-green-500 text-sm mt-1">+{metric.diff}%</p>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Charts */}
+      <div className="grid md:grid-cols-2 gap-6">
+        <div className="shadow-xl hover:shadow-2xl rounded-xl transition">
           <CustomLineChart
             data={chartData}
             xKey="date"
-            lines={[
-              { dataKey: 'users', name: 'Users', color: '#0d6efd' },
-              { dataKey: 'revenue', name: 'Revenue', color: '#198754' },
-            ]}
-            className="h-100"
+            lines={[{ dataKey: 'revenue', name: 'Weekly Revenue', color: '#22d3ee' }]}
+            className="h-full"
           />
         </div>
-        <div className="col-12 col-lg-6">
+
+        <div className="shadow-xl hover:shadow-2xl rounded-xl transition">
           <CustomBarChart
             data={chartData}
             xKey="date"
-            bars={[
-              { dataKey: 'conversions', name: 'Conversions', color: '#ffc107' },
-              { dataKey: 'growth', name: 'Growth %', color: '#dc3545' },
-            ]}
-            className="h-100"
-          />
-        </div>
-        <div className="col-12">
-          <DonutChart
-            data={[
-              { name: 'Social', value: 300 },
-              { name: 'Email', value: 200 },
-              { name: 'Search Ads', value: 500 },
-              { name: 'Display', value: 150 },
-            ]}
-            className="h-100"
+            bars={[{ dataKey: 'users', name: 'Ad Platform Performance', color: '#3b82f6' }]}
+            className="h-full"
           />
         </div>
       </div>
 
-      <h2 className="fw-bold mb-3 detailed-heading">Detailed Data</h2>
-      <DataTable
-        data={chartData}
-        columns={[
-          { key: 'date', label: 'Date' },
-          { key: 'users', label: 'Users' },
-          { key: 'revenue', label: 'Revenue' },
-          { key: 'conversions', label: 'Conversions' },
-          { key: 'growth', label: 'Growth %' },
-        ]}
-      />
-    </div>
-  );
-};
+      {/* Donut */}
+      <div className="shadow-xl hover:shadow-2xl rounded-xl transition mt-6">
+        <DonutChart
+          data={[
+            { name: 'Facebook', value: chartData.filter(d => d.source === 'Facebook').length },
+            { name: 'Google Ads', value: chartData.filter(d => d.source === 'Google Ads').length },
+            { name: 'Instagram', value: chartData.filter(d => d.source === 'Instagram').length }
+          ]}
+          className="h-full"
+        />
+      </div>
 
-export default Dashboard;
+      {/* Table with Pagination */}
+      {!loading && chartData.length > 0 && (
+        <div className="shadow-xl hover:shadow-2xl rounded-xl transition mt-6 bg-white dark:bg-gray-900 p-6">
+          <h3 className="text-lg font-semibold mb-3 text-gray-800 dark:text-white">Campaign Details</h3>
+          <DataTable
+            data={paginatedData}
+            columns={[
+              { key: 'date', label: 'Date' },
+              { key: 'users', label: 'Users' },
+              { key: 'revenue', label: 'Revenue' },
+              { key: 'conversions', label: 'Conversions' },
+              { key: 'growth', label: 'Growth (%)' }
+            ]}
+          />
+
+          {/* Pagination Controls */}
+          <div className="flex justify-between items-center mt-4">
+            <button
+              className="px-3 py-1 text-sm rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 disabled:opacity-50"
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              ◀ Prev
+            </button>
+
+            <span className="text-sm text-gray-700 dark:text-gray-300">
+              Page {currentPage} of {totalPages}
+            </span>
+
+            <button
+              className="px-3 py-1 text-sm rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 disabled:opacity-50"
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+            >
+              Next ▶
+            </button>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}

@@ -1,7 +1,16 @@
-"use client";
-import React, { useEffect, useState } from 'react';
-import { useTheme } from "next-themes";
-import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
+'use client';
+import { useTheme } from 'next-themes';
+import {
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+} from 'recharts';
+import React, { useState, useEffect } from 'react';
+
+const DEFAULT_COLORS = ['#3b82f6', '#10b981', '#f97316', '#f43f5e', '#6366f1'];
 
 type DonutChartProps = {
   data: { name: string; value: number }[];
@@ -10,73 +19,80 @@ type DonutChartProps = {
   className?: string;
 };
 
-const DEFAULT_COLORS = ["#6366f1", "#10b981", "#f59e42", "#ef4444", "#a78bfa", "#0ea5e9", "#eab308"];
-
 export default function DonutChart({
   data,
   colors = DEFAULT_COLORS,
   height = 300,
-  className = "",
+  className = '',
 }: DonutChartProps) {
   const { theme } = useTheme();
+  const [transitionKey, setTransitionKey] = useState(0);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  useEffect(() => {
+    if (mounted) setTransitionKey((prev) => prev + 1);
+  }, [theme]);
+
   if (!mounted) return null;
 
-  const isDark = theme === 'dark';
 
   return (
-    <div className={`card ${className} transition-colors duration-300`}>
-      <div className="card-body">
-        {/* 🔁 Force re-render on theme change */}
-        <ResponsiveContainer width="100%" height={height} key={theme}>
-          <PieChart>
-            <Pie
-              data={data}
-              dataKey="value"
-              nameKey="name"
-              cx="50%"
-              cy="50%"
-              innerRadius={70}
-              outerRadius={100}
-              paddingAngle={5}
-              cornerRadius={5}
-              labelLine={false}
-              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-            >
-              {data.map((_, idx) => (
-                <Cell key={`cell-${idx}`} fill={colors[idx % colors.length]} />
-              ))}
-            </Pie>
-            <Tooltip
-              contentStyle={{
-                backgroundColor: isDark ? '#1f2937' : '#ffffff',
-                borderColor: isDark ? '#4b5563' : '#e5e7eb',
-                borderRadius: '0.5rem',
-                transition: 'all 0.3s ease',
-              }}
-              itemStyle={{
-                color: isDark ? '#f9fafb' : '#111827',
-                transition: 'color 0.3s ease',
-              }}
-              labelStyle={{
-                color: isDark ? '#d1d5db' : '#374151',
-                transition: 'color 0.3s ease',
-              }}
-            />
-            <Legend
-              wrapperStyle={{
-                color: isDark ? '#cbd5e1' : '#4b5563',
-                transition: 'color 0.3s ease',
-              }}
-            />
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
+    <div
+      className={`bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md transition-transform duration-200 hover:scale-[1.01] ${className}`}
+    >
+      <h2 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">
+        Campaign Breakdown
+      </h2>
+
+      <ResponsiveContainer key={transitionKey} width="100%" height={height}>
+        <PieChart>
+          <Pie
+            data={data}
+            dataKey="value"
+            nameKey="name"
+            cx="50%"
+            cy="50%"
+            innerRadius={70}
+            outerRadius={100}
+            paddingAngle={3}
+            label={({ name, percent }: any) =>
+              `${name}: ${(percent * 100).toFixed(0)}%`
+            }
+            isAnimationActive
+          >
+            {data.map((_, i) => (
+              <Cell key={`cell-${i}`} fill={colors[i % colors.length]} />
+            ))}
+          </Pie>
+          <Tooltip
+            contentStyle={{
+              backgroundColor: theme === 'dark' ? '#1f2937' : '#f9fafb',
+              borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+              color: theme === 'dark' ? '#f3f4f6' : '#111827',
+              borderRadius: 8,
+              boxShadow: '0 4px 14px rgba(0, 0, 0, 0.1)',
+            }}
+            itemStyle={{
+              fontSize: 13,
+              color: theme === 'dark' ? '#f9fafb' : '#111827',
+            }}
+          />
+          <Legend
+            iconType="circle"
+            wrapperStyle={{
+              color: theme === 'dark' ? '#e5e5e5' : '#1f2937',
+              fontSize: 12,
+            }}
+            layout="horizontal"
+            verticalAlign="bottom"
+            align="center"
+          />
+        </PieChart>
+      </ResponsiveContainer>
     </div>
   );
 }
