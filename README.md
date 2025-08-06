@@ -37,11 +37,43 @@ Explore the live, deployed version of the dashboard here:
 ---
 
 ## 🚀 Installation & Setup
-
 To get a copy of this project up and running locally:
 
 ### 1. Clone the Repository
-
 ```bash
 git clone https://github.com/CodeAura7/ADmyBRAND-Analytics-Dashboard.git
 cd ADmyBRAND-Analytics-Dashboard
+```
+
+### 2. Install Dependencies
+Make sure you have **Node.js v18+** installed.
+```bash
+npm install
+```
+
+### 3. Run the Development Server
+```bash
+npm run dev
+```
+
+Visit the app in your browser at:
+```
+http://localhost:3000
+```
+
+## 🤝 Contributing
+
+Pull requests are welcome!  
+If you have ideas for new features, design improvements, or performance optimizations, feel free to fork the repository and submit a pull request.
+
+Please ensure that your changes:
+- Are well-documented
+- Fit within the project's modular structure
+- Are not auto-generated boilerplate unless meaningfully customized
+
+---
+
+## 📝 License
+
+Distributed under the [MIT License](LICENSE).
+
