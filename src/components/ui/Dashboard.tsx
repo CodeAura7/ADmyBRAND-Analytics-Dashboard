@@ -1,12 +1,16 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import CustomLineChart from '@/components/LineChart';
-import CustomBarChart from '@/components/BarChart';
-import DonutChart from '@/components/DonutChart';
-import DataTable from '@/components/DataTable';
-import ThemeToggle from '@/components/ThemeToggle';
-import Filter from '@/components/Filter';
+import CustomLineChart from '@/components/charts/LineChart';
+import CustomBarChart from '@/components/charts/BarChart';
+import DonutChart from '@/components/charts/DonutChart';
+import DataTable from '@/components/charts/DataTable';
+import ThemeToggle from '@/components/ui/ThemeToggle';
+import Filter from '@/components/ui/Filter';
+import { MetricCard } from '@/components/ui/MetricCard';
+import SkeletonCard from '@/components/skeleton/SkeletonCard';
+import SkeletonChart from '@/components/skeleton/SkeletonChart';
+import SkeletonTable from '@/components/skeleton/SkeletonTable';
 
 const CSVLink = dynamic(() => import('react-csv').then(mod => mod.CSVLink), { ssr: false });
 
@@ -110,63 +114,70 @@ export default function Dashboard() {
 
       {/* Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-        {metrics.map((metric) => {
-          const isCurrency = metric.id === 'revenue';
-          const isPercentage = metric.id === 'growth';
-          return (
-            <div
-              key={metric.id}
-              className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-5 shadow-md hover:shadow-lg transition"
-            >
-              <p className="text-sm text-gray-500 dark:text-gray-400">{metric.title}</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
-                {isCurrency
-                  ? `$${metric.value.toLocaleString()}`
-                  : isPercentage
-                  ? `${metric.value}%`
-                  : metric.value.toLocaleString()}
-              </p>
-              <p className="text-green-500 text-sm mt-1">+{metric.diff}%</p>
-            </div>
-          );
-        })}
+        {loading
+          ? [...Array(4)].map((_, idx) => (
+              <SkeletonCard key={idx} />
+            ))
+          : metrics.map((metric) => (
+              <MetricCard
+                key={metric.id}
+                title={metric.title}
+                value={
+                  metric.id === 'revenue'
+                    ? `$${metric.value.toLocaleString()}`
+                    : metric.id === 'growth'
+                    ? `${metric.value}%`
+                    : metric.value.toLocaleString()
+                }
+                growth={`+${metric.diff}%`}
+                subtext="from last month"
+              />
+            ))}
       </div>
 
       {/* Charts */}
       <div className="grid md:grid-cols-2 gap-6">
-        <div className="shadow-xl hover:shadow-2xl rounded-xl transition">
+        {loading ? (
+          <SkeletonChart />
+        ) : (
           <CustomLineChart
             data={chartData}
             xKey="date"
             lines={[{ dataKey: 'revenue', name: 'Weekly Revenue', color: '#22d3ee' }]}
             className="h-full"
           />
-        </div>
+        )}
 
-        <div className="shadow-xl hover:shadow-2xl rounded-xl transition">
+        {loading ? (
+          <SkeletonChart />
+        ) : (
           <CustomBarChart
             data={chartData}
             xKey="date"
             bars={[{ dataKey: 'users', name: 'Ad Platform Performance', color: '#3b82f6' }]}
             className="h-full"
           />
-        </div>
+        )}
       </div>
 
       {/* Donut */}
-      <div className="shadow-xl hover:shadow-2xl rounded-xl transition mt-6">
+      {loading ? (
+        <SkeletonChart />
+      ) : (
         <DonutChart
           data={[
             { name: 'Facebook', value: chartData.filter(d => d.source === 'Facebook').length },
             { name: 'Google Ads', value: chartData.filter(d => d.source === 'Google Ads').length },
             { name: 'Instagram', value: chartData.filter(d => d.source === 'Instagram').length }
           ]}
-          className="h-full"
+          className="h-full mt-6"
         />
-      </div>
+      )}
 
-      {/* Table with Pagination */}
-      {!loading && chartData.length > 0 && (
+      {/* Table */}
+      {loading ? (
+        <SkeletonTable />
+      ) : chartData.length > 0 ? (
         <div className="shadow-xl hover:shadow-2xl rounded-xl transition mt-6 bg-white dark:bg-gray-900 p-6">
           <h3 className="text-lg font-semibold mb-3 text-gray-800 dark:text-white">Campaign Details</h3>
           <DataTable
@@ -179,8 +190,6 @@ export default function Dashboard() {
               { key: 'growth', label: 'Growth (%)' }
             ]}
           />
-
-          {/* Pagination Controls */}
           <div className="flex justify-between items-center mt-4">
             <button
               className="px-3 py-1 text-sm rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 disabled:opacity-50"
@@ -189,11 +198,9 @@ export default function Dashboard() {
             >
               ◀ Prev
             </button>
-
             <span className="text-sm text-gray-700 dark:text-gray-300">
               Page {currentPage} of {totalPages}
             </span>
-
             <button
               className="px-3 py-1 text-sm rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 disabled:opacity-50"
               onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
@@ -203,7 +210,7 @@ export default function Dashboard() {
             </button>
           </div>
         </div>
-      )}
+      ) : null}
     </section>
   );
 }

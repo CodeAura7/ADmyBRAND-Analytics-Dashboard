@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import type { FilterOptions } from '../types';
+import type { FilterOptions } from '../../types';
 
 export default function Filter({
   onFilter,
@@ -18,20 +18,20 @@ export default function Filter({
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {/* Start Date */}
         <div>
-          <label className="block text-m font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-m font-medium text-black dark:text-gray-300 mb-1">
             Start Date
           </label>
           <input
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-sm px-3 py-2 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-sm px-3 py-2 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
           />
         </div>
 
         {/* End Date */}
         <div>
-          <label className="block text-m font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-m font-medium text-black dark:text-gray-300 mb-1">
             End Date
           </label>
           <input
@@ -44,13 +44,13 @@ export default function Filter({
 
         {/* Campaign Type */}
         <div>
-          <label className="block text-m font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-m font-medium text-black dark:text-gray-300 mb-1">
             Campaign Type
           </label>
           <select
             value={campaignType}
             onChange={(e) => setCampaignType(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-sm px-3 py-2 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-sm px-3 py-2 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
           >
             <option value="">All</option>
             {campaignTypes.map((type) => (

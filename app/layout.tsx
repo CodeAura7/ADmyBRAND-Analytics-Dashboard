@@ -11,7 +11,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="min-h-screen font-sans transition-colors duration-300 bg-white text-gray-900 dark:bg-gray-950 dark:text-white">
             {/* Top Navbar */}
             <nav className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-3 flex items-center justify-between">
-              <div className="font-semibold text-lg">📊 ADmyBRAND Dashboard</div>
+              <div className="font-semibold text-lg">📊 ADmyBRAND Insights</div>
               <div className="hidden md:flex space-x-6 text-sm text-gray-700 dark:text-gray-300">
                 <a href="#" className="text-black dark:text-white font-semibold text-base hover:text-black dark:hover:text-white">Dashboard</a>
                 <a href="#" className="text-black dark:text-white font-semibold text-base hover:text-black dark:hover:text-white">Reports</a>
