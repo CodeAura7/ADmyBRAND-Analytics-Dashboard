@@ -1,62 +1,47 @@
-# ADmyBRAND Insights
+# 📊 ADmyBRAND-Insights: AI-Powered Analytics Dashboard
 
-![Next.js](https://img.shields.io/badge/Next.js-14-blue)
-![TypeScript](https://img.shields.io/badge/TypeScript-✓-3178c6)
-![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-purple)
-![Recharts](https://img.shields.io/badge/Recharts-✓-green)
-![License](https://img.shields.io/github/license/yourusername/ADmyBRAND-Insights)
+Welcome to the **ADmyBRAND-Insights** dashboard, a modern, responsive analytics platform built with **Next.js** and **Tailwind CSS**. This project serves as a showcase of a sophisticated front-end application with dynamic data visualization, filtering, and a mobile-first design approach.
 
-**ADmyBRAND Insights** is a modern, responsive analytics dashboard tailored for digital marketing agencies. It offers interactive data visualizations, campaign filters, a responsive layout, and dark/light theme support.
+---
+
+## ✨ Live Demo
+
+Explore the live, deployed version of the dashboard here:  
+🔗 [https://admybrandinsights.vercel.app/](https://admybrandinsights.vercel.app/)
 
 ---
 
 ## 🚀 Features
 
-- 📊 Overview cards for key metrics  
-- 📈 Interactive charts (Line, Bar, Donut) using [Recharts](https://recharts.org)  
-- 📋 Data table with pagination  
-- 🔍 Filtering by date range and campaign type  
-- 🌗 Dark/Light mode toggle using `next-themes`  
-- 📁 Export feature (console-based currently; easily extendable)  
+- **Responsive & Mobile-First Design**: Optimized layout and components for all devices.
+- **Dynamic Data Visualization**: Interactive Line, Bar, and Donut charts powered by **Recharts**.
+- **Real-time Metrics**: Simulated real-time updates for KPIs like Revenue, Users, and Conversions.
+- **Advanced Filtering**: Filter data by custom date range and campaign types (Google Ads, Facebook, Instagram).
+- **Interactive Data Table**: Paginated table with hover effects for campaign insights.
+- **Dark/Light Mode**: Toggle between modern dark and light interfaces.
+- **Loading States**: Custom skeleton components enhance UX while loading data.
+- **Data Export**: Export current filtered data to a CSV file.
+- **Clean Component Architecture**: Modular, reusable components for scalability and maintenance.
 
 ---
 
-## 🛠 Getting Started
+## 🛠️ Technology Stack
 
-### 1. Clone the repository
+- **Framework**: Next.js 14  
+- **Styling**: Tailwind CSS  
+- **Charting**: Recharts  
+- **Theming**: next-themes  
+- **Icons**: React Icons  
+- **Data Export**: react-csv  
 
-   ```bash
-   git clone https://github.com/yourusername/ADmyBRAND-Insights.git
-   cd ADmyBRAND-Insights
+---
 
-2. Install dependencies
-   
-   Make sure you have Node.js (v18 or above) installed.
-   bash
+## 🚀 Installation & Setup
 
-npm install
-3. Run the development server
+To get a copy of this project up and running locally:
 
-   bash
-   npm run dev
-   Open your browser and go to http://localhost:3000
+### 1. Clone the Repository
 
-🧰 Technologies Used
--Next.js 14
--TypeScript
--Bootstrap 5.3
--Recharts – data visualizations
--next-themes – theme switching (dark/light)
--CSS Modules + Global CSS
-
-## Contributing
-
-Contributions are welcome! Please open an issue or submit a pull request for any enhancements or bug fixes.
-
-## License
-
-<<<<<<< HEAD
-This project is licensed under the MIT License. See the LICENSE file for details.
-=======
-This project is licensed under the MIT License. See the LICENSE file for details.
->>>>>>> 32484ea9e83938e26cea09474b0a5a09273aa7ad
+```bash
+git clone https://github.com/CodeAura7/ADmyBRAND-Analytics-Dashboard.git
+cd ADmyBRAND-Analytics-Dashboard
